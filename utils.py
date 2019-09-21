@@ -1,4 +1,38 @@
 import csv
+import wordsegment as ws
+ws.load()
+from nltk.tokenize import TweetTokenizer #https://www.nltk.org/api/nltk.tokenize.html
+from nltk.corpus import stopwords
+import re
+
+def interweave(doc,labels):
+    """
+        Interweaves the negative and positive examples
+        The documents with more examples should be primary
+        doc[0]: should be the majority sample
+        doc[1]: should be the minority sample
+    """
+    primary = doc[0]
+    secondary = doc[1]
+
+    primary_label = labels[0]
+    secondary_label = labels[1]
+    
+    weave = []
+    weave_labels = []
+    for i in range(len(primary)):
+        weave.append(primary[i])
+        weave_labels.append(primary_label)
+        try:
+            weave.append(secondary[i])
+            weave_labels.append(secondary_label)
+        except:
+            r = random.randint(0,len(secondary)-1)
+            weave.append(secondary[r])
+            weave_labels.append(secondary_label)
+    
+    
+    return (weave, weave_labels)
 
 
 def openHasocFile(file_location):
@@ -29,16 +63,7 @@ def find_max_len(data):
         if  l > max_len:
             max_len = l
     return max_len
-
-def convert_to_one_hot(labels,c=None):
-    if c == None:
-        raise("Error: Num categories not specified")
-    else:
-        oh = np.zeros((len(labels),c))
-        for i in range(len(labels)):
-            oh[i,labels[i]] = 1
-        return oh
-    
+       
 def preprocess(data):
     """
     Preprocessing Unit as described in Davidson et. al.
